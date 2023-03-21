@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.9'
 services:
   mysql-db:
     container_name: mysql-db
@@ -10,7 +10,25 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
     ports:
       - '3306:3306'
-    restart: always
+    env_file:
+      - ./.env
+    networks:
+      - backend
+
+  express-app:
+    container_name: express-app
+    build: .
+    command: yarn start
+    ports:
+      - '6476:6476'
+    environment:
+      MYSQL_HOST: mysql-db
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    depends_on:
+      - mysql-db
     env_file:
       - ./.env
     networks:
